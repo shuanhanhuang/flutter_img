@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:photo_view/photo_view.dart';
+import 'package:photo_view/photo_view_gallery.dart';
+
 
 void main() => runApp(MyApp());
 
@@ -15,6 +18,7 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
 
 class MyHomePage extends StatelessWidget {
   @override
@@ -48,7 +52,7 @@ class MyHomePage extends StatelessWidget {
     );
 
     final widget = Center(
-      child: Column(
+      child: Stack(
         children: <Widget>[
           Container(
             child: imgBrowser,
@@ -56,13 +60,14 @@ class MyHomePage extends StatelessWidget {
           ),
           Container(
             child: Row(
-              children: <Widget>[previousBtn, nextBtn],
+              children: <Widget>[previousBtn, nextBtn],//previousBtn, nextBtn
               mainAxisAlignment: MainAxisAlignment.center,
             ),
             margin: EdgeInsets.symmetric(vertical: 10),
           ),
         ],
-        mainAxisAlignment: MainAxisAlignment.center,
+        alignment:Alignment.topCenter
+        //mainAxisAlignment: MainAxisAlignment.center,
       ),
     );
 
@@ -94,9 +99,45 @@ class _ImageBrowser extends StatefulWidget {
 
 class _ImageBrowserState extends State<_ImageBrowser> {
   @override
+
   Widget build(BuildContext context) {
-    Image img = Image.asset(widget._images[widget._imageIndex]);
-    return img;
+    return Container(
+        child: PhotoViewGallery.builder(
+            scrollPhysics: const BouncingScrollPhysics(),
+            builder: (BuildContext context, int index) {
+    return PhotoViewGalleryPageOptions(
+    imageProvider: AssetImage(widget._images[widget._imageIndex]),
+    initialScale: PhotoViewComputedScale.contained * 0.8,
+    //heroAttributes: PhotoViewHeroAttributes(tag: galleryItems[index].id),
+    );
+    },
+
+    itemCount: widget._images.length,
+    loadingBuilder: (context, event) => Center(
+      child: Container(
+        width: 20.0,
+        height: 20.0,
+        child: CircularProgressIndicator(
+          value: event == null
+              ? 0
+              : event.cumulativeBytesLoaded / event.expectedTotalBytes,
+        ),
+      ),
+    ),
+          backgroundDecoration: BoxDecoration(color:Colors.green),
+  )
+    /*var img=PhotoView(
+      imageProvider:AssetImage(widget._images[widget._imageIndex]),
+      enableRotation:true,
+      maxScale: PhotoViewComputedScale.covered,
+      minScale: PhotoViewComputedScale.contained*0.6,
+      //backgroundDecoration:BoxDecoration(color:Colors.green),
+
+    );
+    //Image img = Image.asset(widget._images[widget._imageIndex]);
+    return img;*/
+
+        );
   }
 
   previousImage() {
